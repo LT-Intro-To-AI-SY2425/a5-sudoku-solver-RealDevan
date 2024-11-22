@@ -159,14 +159,15 @@ class Board:
             assignment - value to place at given row, column coordinate
         """
         self.rows[row][column] = assignment
+        self.num_nums_placed += 1
 
         for i in range(self.size):
             remove_if_exists(self.rows[row][i], assignment)
             remove_if_exists(self.rows[i][column], assignment)
-        
-        print(self.subgrid_coordinates(row, column))
+
         for i, j in self.subgrid_coordinates(row, column):
             remove_if_exists(self.rows[i][j], assignment)
+
          
 
 
@@ -182,16 +183,26 @@ def DFS(state: Board) -> Board:
     Returns:
         either None in the case of invalid input or a solved board
     """
-    s = Stack((state))
-    b = s.pop()
-    print(b)
-    mcc = b.find_most_constrained_cell()
-    row = mcc[0]
-    col = mcc[1]
-    for sel in b.rows[row][col]:
-        cpy = copy.deepcopy()
-        b.update(row, col, sel)
-        s.push(b)
+    s = Stack([state])
+
+    while not s.is_empty():
+        print(s)
+        b: Board = s.pop()
+        # print(b)
+        if b.goal_test():
+            return b
+        mcc = b.find_most_constrained_cell()
+        print(mcc)
+        
+        row = mcc[0]
+        col = mcc[1]
+        print(b.rows[row][col])
+        print()
+        for sel in b.rows[row][col]:
+            cpy = copy.deepcopy(b)
+            cpy.update(row, col, sel)
+            s.push(cpy)
+    
     
      
 
@@ -208,6 +219,20 @@ def BFS(state: Board) -> Board:
     Returns:
         either None in the case of invalid input or a solved board
     """
+    q = Queue([state])
+
+    while not q.is_empty():
+        b: Board = q.pop()
+        if b.goal_test():
+            return b
+        mcc = b.find_most_constrained_cell()
+        row, col = mcc
+        for val in b.rows[row][col]:
+            cpy = copy.deepcopy(b)
+            cpy.update(row, col, val)
+            q.push(cpy)
+
+    return None
     
 
 
